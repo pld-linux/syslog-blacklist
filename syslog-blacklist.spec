@@ -6,7 +6,8 @@
 %include	/usr/lib/rpm/macros.perl
 Summary:	Intrusion Blocking with Perl and Ipset
 Name:		syslog-blacklist
-Version:	0.1
+# from debian/changelog
+Version:	1.5
 Release:	0.1
 License:	GPL v2+
 Group:		Applications/Networking
@@ -15,6 +16,7 @@ Group:		Applications/Networking
 Source0:	%{name}.tar.gz
 # Source0-md5:	51258b2c1225333feb181e2ee4117716
 URL:		http://bogeskov.dk/Ipset.html
+BuildRequires:	dpkg
 BuildRequires:	rpm-perlprov >= 4.1-13
 Requires:	ipset
 BuildArch:	noarch
@@ -28,6 +30,10 @@ which pattermatches against loglines and then tracks ip using ipset.
 %setup -q -n %{name}
 mv root/* .
 mv debian/copyright .
+
+%build
+ver=$(dpkg-parsechangelog --show-field Version)
+test "$ver" = "%{version}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
