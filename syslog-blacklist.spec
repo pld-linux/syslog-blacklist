@@ -8,17 +8,19 @@ Summary:	Intrusion Blocking with Perl and Ipset
 Name:		syslog-blacklist
 # from debian/changelog
 Version:	1.5
-Release:	0.1
+Release:	0.3
 License:	GPL v2+
 Group:		Applications/Networking
 # git clone http://bogeskov.dk/git/syslog-blacklist.git
 # tar --exclude-vcs -czf syslog-blacklist.tar.gz syslog-blacklist
 Source0:	%{name}.tar.gz
 # Source0-md5:	51258b2c1225333feb181e2ee4117716
+Patch0:		geoip.patch
 URL:		http://bogeskov.dk/Ipset.html
 BuildRequires:	dpkg
 BuildRequires:	rpm-perlprov >= 4.1-13
 Requires:	ipset
+Suggests:	perl-Geo-IP
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -28,6 +30,7 @@ which pattermatches against loglines and then tracks ip using ipset.
 
 %prep
 %setup -q -n %{name}
+%patch0 -p1
 mv root/* .
 mv debian/copyright .
 
