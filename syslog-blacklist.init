@@ -1,0 +1,109 @@
+#!/bin/sh
+#
+# syslog-blacklist	syslog-blacklist startup script
+#
+# chkconfig:	345 20 80
+# description:	This script starts the syslog-blacklist daemon.
+# processname:	syslog-blacklist
+
+# Source function library
+. /etc/rc.d/init.d/functions
+
+# Get network config
+. /etc/sysconfig/network
+
+# Check that networking is up.
+if is_yes "${NETWORKING}"; then
+	if [ ! -f /var/lock/subsys/network -a "$1" != stop -a "$1" != status ]; then
+		msg_network_down "Syslog blacklist"
+		exit 1
+	fi
+else
+	exit 0
+fi
+
+# Set defaults
+OPTIONS=""
+
+# Get service config - may override defaults
+[ -f /etc/sysconfig/syslog-blacklist ] && . /etc/sysconfig/syslog-blacklist
+
+pidfile="/var/run/syslog-blacklist.pid"
+
+start() {
+	# Check if the service is already running?
+	if [ -f /var/lock/subsys/syslog-blacklist ]; then
+		msg_already_running "Syslog blacklist"
+		return
+	fi
+
+	msg_starting "Syslog blacklist"
+	daemon /usr/sbin/syslog-blacklist --pidfile=$pidfile $OPTIONS
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/syslog-blacklist
+}
+
+stop() {
+	if [ ! -f /var/lock/subsys/syslog-blacklist ]; then
+		msg_not_running "Syslog blacklist"
+		return
+	fi
+
+	# Stop daemons.
+	msg_stopping "Syslog blacklist"
+	killproc --pidfile $pidfile syslog-blacklist -TERM
+	rm -f /var/lock/subsys/syslog-blacklist
+}
+
+reload() {
+	if [ ! -f /var/lock/subsys/syslog-blacklist ]; then
+		msg_not_running "Syslog blacklist"
+		RETVAL=7
+		return
+	fi
+
+	msg_reloading "Syslog blacklist"
+	killproc --pidfile $pidfile syslog-blacklist -HUP
+	RETVAL=$?
+}
+
+condrestart() {
+	if [ ! -f /var/lock/subsys/syslog-blacklist ]; then
+		msg_not_running "Syslog blacklist"
+		RETVAL=$1
+		return
+	fi
+
+	stop
+	start
+}
+
+RETVAL=0
+# See how we were called.
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart)
+	stop
+	start
+	;;
+  try-restart)
+	condrestart 0
+	;;
+  reload|force-reload)
+	reload
+	;;
+  status)
+	status --pidfile $pidfile syslog-blacklist
+	RETVAL=$?
+	;;
+  *)
+	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|status}"
+	exit 3
+esac
+
+exit $RETVAL
