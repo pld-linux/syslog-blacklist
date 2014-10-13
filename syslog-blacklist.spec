@@ -1,6 +1,4 @@
 # TODO
-# etc/default/syslog-blacklist
-# etc/init.d/syslog-blacklist
 # etc/logrotate.d/syslog-blacklist
 # etc/rsyslog.d/01-syslog-blacklist.conf
 %include	/usr/lib/rpm/macros.perl
@@ -8,7 +6,7 @@ Summary:	Intrusion Blocking with Perl and Ipset
 Name:		syslog-blacklist
 # from debian/changelog
 Version:	1.5
-Release:	0.4
+Release:	1
 License:	GPL v2+
 Group:		Applications/Networking
 # git clone http://bogeskov.dk/git/syslog-blacklist.git
