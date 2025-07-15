@@ -32,7 +32,7 @@ which pattermatches against loglines and then tracks ip using ipset.
 
 %prep
 %setup -q -n %{name}
-%patch0 -p1
+%patch -P0 -p1
 mv root/* .
 mv debian/copyright .
 
